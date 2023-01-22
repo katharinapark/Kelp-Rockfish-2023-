@@ -1,0 +1,4 @@
+install.packages("tidyverse")
+library(tidyverse)
+setwd("C:/Users/katka/OneDrive/Desktop/NOAA Kelp Rockfish")
+recfin <- read_csv("Recfin_CA_2004-2022.csv")
