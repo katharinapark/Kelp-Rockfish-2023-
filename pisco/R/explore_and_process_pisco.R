@@ -1,6 +1,6 @@
 ################################################################################
 ##  R script to look at PISCO data for kelp rockfish
-##  Katharina
+##  Katharina Park
 ##  Combination of script from Emma Saas kelp rockfish and 
 ##  Melissa Monk's gopher rockfish assessment 
 ## 
@@ -154,13 +154,14 @@ species.transects <- species.transects %>%
 #now collapse transects sampled at the same level, site_side and day
 #or else keep them separate and somehow ID them as replicates
 species.transects.collapsed <- species.transects %>%
-  group_by(year, month, day, site_side, campus, zone, level, CA_MPA_Name_Short,
+  group_by(year, month, day, site_side, campus, zone, 
+           level, CA_MPA_Name_Short, latitude, longitude,
            site_designation, site_status) %>%
   summarise(number.transects = n(),
             number.fish = sum(total_fish)) %>%
   mutate(cpue = number.fish/number.transects)
 #assuming that each transect is equal - check if bottom and mid are the same volume
-
+save(species.transects.collapsed, file = "species.transects.collapsed.RData")
 
 #super noisy and messy
 ggplot(species.transects.collapsed %>% 
