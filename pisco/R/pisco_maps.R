@@ -32,8 +32,8 @@ setwd(dir)
 load("species.transects.collapsed.RData")
 pisco <- species.transects.collapsed
 
-lon_range <- c(-125,-117)
-lat_range <- c(32.2, 42)
+lon_range <- c(-121,-117)
+lat_range <- c(33.2, 35)
 
 
 ggplot() +

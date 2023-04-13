@@ -5,8 +5,6 @@
 ##  Melissa Monk's gopher rockfish assessment 
 ## 
 ################################################################################
-
-
 #Remove all variables and turn off open graphics
 rm(list=ls(all=TRUE))
 graphics.off()
@@ -48,13 +46,14 @@ Transects <- read.csv("Transects.csv")
 #filter the observations to just the species of interest
 FishLengths <- FishLengths %>%
   dplyr::select(-X) %>%
-  filter(classcode == species,
-         fish_tl >= min_size)
+  filter(classcode == species)#,
+  #       fish_tl >= min_size)
 
 #remove X - rownames column
 Transects <- Transects %>% dplyr::select(-X)
 luSite <- luSite %>% dplyr::select(-X) %>%
   rename(site_side = site)
+
 #collapse the number of fish by transect
 species.data <- FishLengths %>%
   dplyr::select(TransectID, count) %>% #later on convert to biomass here
@@ -65,7 +64,7 @@ species.data <- FishLengths %>%
 species.transects <- left_join(Transects, species.data) %>%
   mutate(total_fish = ifelse(is.na(total_fish), 0, total_fish)) #convert NA to 0
 
-#merge in the sitelocation data
+pinniger#merge in the sitelocation data
 species.transects <- left_join(species.transects, luSite)
 
 #look at summary species data before collapsing transects so you don't have to 
@@ -144,6 +143,7 @@ View(site_year)
 site_year_sampled <- species.transects %>%
   group_by(site_side) %>%
   summarise(n_years = n_distinct(year))
+
 #in sample 23 years is the max - keep sites for now sampled in at least 10 years
 site_year_sampled_keep <- site_year_sampled %>%
   filter(n_years>9)
@@ -184,8 +184,7 @@ ggplot(species.transects.collapsed %>%
 
 #plot average cpue by mpa and designation
 ggplot(species.transects.collapsed %>% 
-         group_by(year, site_status, campus) %>% 
+         group_by(year, site_status) %>% 
          summarise(average_cpue = mean(cpue))) +
   geom_line(aes(x = year, y = average_cpue, colour = site_status)) +
-  xlab("Year") + ylab("Average CPUE") +
-  facet_wrap(~campus)
+  xlab("Year") + ylab("Average CPUE") 
