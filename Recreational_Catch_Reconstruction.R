@@ -1,12 +1,29 @@
+################################################################
+#
+#
+#
+#
+################################################################
+
+library(ggplot2)
+library(dplyr)
+
 #df turns csv into data frame 
 
 recdf <- read.csv(file = "Catch_Reconstruction_Recreational.csv")
-library(ggplot2)
 
 #Get rid of X 
 
 recdf$X <- NULL
 recdf$X.1 <- NULL
+
+
+# Read in commercial data 
+commercialdf <- read.csv(file = "Catch_Reconstruction_Commercial.csv")
+commercialdf$X <- NULL
+
+
+
 
 #Create line chart of Rec PC Mode
 
@@ -25,18 +42,17 @@ print(recPR)
 
 #Combine both PC and PR modes into one chart to compare recreational landings 
 
-ggplot(recdf, aes(x = YEAR)) +
-  geom_line(aes(y = CATCH.MT, color = "CATCH.MT")) +
-  geom_line(aes(y = CATCH.MT.1, color = "CATCH.MT.1")) +
+ggplot(recdf, aes(x = YEAR, y = CATCH.MT, colour = as.factor(MODE))) +
+  geom_line(linewidth = 2) +
   labs(title = "Kelp Rockfish Recreational Catch Reconstruction CA", x = "YEAR", y = "Catch in MT (Metric Tons)",
        color = "Mode") +
-  scale_color_manual(values = c("CATCH.MT" = "blue", "CATCH.MT.1" = "red"),
-                     labels = c("PC", "PR")) +
+  scale_colour_viridis_d()
+#  scale_color_manual(values = c("CATCH.MT" = "blue", "CATCH.MT.1" = "red"),
+#                     labels = c("PC", "PR")) +
   theme_minimal()
+ 
 
-# Read in commercial data 
-commercialdf <- read.csv(file = "Catch_Reconstruction_Commercial.csv")
-commercialdf$X <- NULL
+
 
 #Rename variable 
 
@@ -54,7 +70,6 @@ print(commercial)
 
 #Create line chart displaying both recreational and commercial catches
 
-library(ggplot2)
 
 recandcommercial <- ggplot()
 
@@ -74,6 +89,25 @@ recandcommercial <- recandcommercial + xlab("Year") + ylab("Catch in mt (metric 
 # Print the plot
 print(recandcommercial)
 
+####
+commercialdf <- commercialdf %>%
+  rename(YEAR = LANDING_YEAR,
+         CATCH.MT = Catch_mt) %>%
+  mutate(MODE = "COM")
+
+
+
+
+# Combine catches ####
+#combine recreational and commercial catches
+catches <- rbind(recdf[, c(1,3,2)], commercialdf[,1:3])
+
+
+ggplot(catches, aes(x = YEAR, y = CATCH.MT, colour = as.factor(MODE))) +
+  geom_line(linewidth = .8) +
+  labs(title = "Kelp Rockfish Catch Reconstruction CA", x = "YEAR", y = "Catch in MT (Metric Tons)",
+       color = "Mode") +
+  scale_colour_viridis_d()
 
 
 
