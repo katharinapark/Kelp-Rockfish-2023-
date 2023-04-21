@@ -22,7 +22,7 @@ library(here)
 
 
 #Set the species you want to work on
-species <- "SATR"
+species <- "SMEL"
 #Set the minimum size for the the species that you want to keep
 min_size <- 15
 #Set the parameters for the weight-length conversion
@@ -36,23 +36,53 @@ weight_length_b <- 3.14
 dir <- file.path(here(),"pisco", "data")
 setwd(dir)
 
-#read in the csv files
-FishLengths <- read.csv("FishLengths.csv")
+#read in all of the csv's from Avery Parsons-Field (UCSB)
+#Includes biomass calculations, but exclude canopy and some additional transects
+#Fish_biomass <- read.csv("MLPA_fish_biomass_density_transect_raw.csv")
 luSite <- read.csv("luSite.csv")
-luSpeciesCode <- read.csv("luSpeciesCode.csv")
-Transects <- read.csv("Transects.csv")
+#looks to be summary data
+#Fish_site_means_target <- read.csv("MLPA_fish_site_means_with_targeted.csv")
+#Raw data through 2021
+Kelpforest_fish <- read.csv("MLPA_kelpforest_fish.csv")
+
+
+#####
+
+
+
+
+
+#Kelp rockfish summary ---------------------------------------------------------
+
+kelprf <- Kelpforest_fish %>%
+  filter(classcode == species)
+
+kelprf %>%
+  group_by(campus, level, zone) %>%
+  summarise(total_fish = sum(count)) %>%
+  pivot_wider(names_from = zone, values_from = total_fish)
+
+#sum bottom and mid
+
+
+
+#Transects ---------------------------------------------------------------------
+#Look at the number of transects
+
+Transects <- Kelpforest_fish %>%
+  dplyr::select(campus, method, survey_year, year, month, day, site, zone, 
+                level, transect, depth, vis, temp, surge, pctcnpy, 
+                site_name_old) %>%
+  unique()
+
+
+
+
+
+
 
 #-------------------------------------------------------------------------------
-#filter the observations to just the species of interest
-FishLengths <- FishLengths %>%
-  dplyr::select(-X) %>%
-  filter(classcode == species)#,
-  #       fish_tl >= min_size)
 
-#remove X - rownames column
-Transects <- Transects %>% dplyr::select(-X)
-luSite <- luSite %>% dplyr::select(-X) %>%
-  rename(site_side = site)
 
 #collapse the number of fish by transect
 species.data <- FishLengths %>%
@@ -128,9 +158,7 @@ summary(as.factor(species.transects$vis)) #lots of NA's
 summary(as.factor(species.transects$surge))  #lots of blanks
 summary(as.factor(species.transects$depth)) #lots of NA's
 
-#off the bat remove any sites with "old" in the name
-species.transects <- species.transects %>%
-  filter(!str_detect(site_side, '^OLD'))
+
 
 #look at the sites by year
 site_year <- species.transects %>%
